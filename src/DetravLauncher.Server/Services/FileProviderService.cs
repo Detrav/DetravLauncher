@@ -1,4 +1,5 @@
 ﻿using DetravLauncher.Server.Models;
+using Microsoft.Extensions.Options;
 
 namespace DetravLauncher.Server.Services
 {
@@ -10,14 +11,18 @@ namespace DetravLauncher.Server.Services
         private readonly object _locker = new object();
         private readonly Dictionary<string, FileModel> files = new Dictionary<string, FileModel>();
 
-        public FileProviderService(MainConfigModel config)
+        public FileProviderService(IOptions<MainConfigModel> config)
         {
-            this.config = config;
+            this.config = config.Value;
 
-            if (String.IsNullOrWhiteSpace(config.ContentPath))
-                throw new ArgumentNullException(nameof(config.ContentPath));
+            if (String.IsNullOrWhiteSpace(this.config.ContentPath))
+                throw new ArgumentNullException(nameof(this.config.ContentPath));
 
-            var directory = Path.GetFullPath(config.ContentPath);
+            if (!Directory.Exists(this.config.ContentPath))
+                Directory.CreateDirectory(this.config.ContentPath);
+
+
+            var directory = Path.GetFullPath(this.config.ContentPath);
 
             this.directory = directory.TrimEnd('/', '\\');
             this.directoryTrimLen = directory.Length + 1;
@@ -27,18 +32,18 @@ namespace DetravLauncher.Server.Services
         {
             string folder = GetFileInternal(name);
 
-            if (!Directory.Exists(folder))
-                throw new DirectoryNotFoundException(name);
+            if (Directory.Exists(folder))
 
-            lock (_locker)
             {
-
-                foreach (var item in Scan(folder))
+                lock (_locker)
                 {
-                    yield return item;
+
+                    foreach (var item in Scan(folder))
+                    {
+                        yield return item;
+                    }
                 }
             }
-
         }
 
         private IEnumerable<FileModel> Scan(string folder)

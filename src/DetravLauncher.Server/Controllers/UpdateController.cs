@@ -20,7 +20,7 @@ namespace DetravLauncher.Server.Controllers
         }
 
         [HttpGet("List/{name}")]
-        public FileListModel GetList(string name)
+        public ActionResult<FileListModel> GetList(string name)
         {
             var result = new FileListModel();
             result.Files.AddRange(fileProvider.GetList(name));
@@ -28,7 +28,7 @@ namespace DetravLauncher.Server.Controllers
         }
 
         [HttpGet("File")]
-        public FileResult GetFile(string? path = null)
+        public ActionResult GetFile(string? path = null)
         {
             if (String.IsNullOrWhiteSpace(path))
                 throw new ArgumentNullException(nameof(path));

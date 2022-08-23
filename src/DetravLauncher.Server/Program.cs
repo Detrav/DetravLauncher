@@ -1,9 +1,22 @@
 using DetravLauncher.Server.Models;
 using DetravLauncher.Server.Services;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ConfigureEndpointDefaults(
+
+        lo =>
+
+        lo.Protocols = HttpProtocols.Http1AndHttp2
+
+        );
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -15,17 +28,14 @@ builder.Services.AddSingleton<FileProviderService>();
 
 var app = builder.Build();
 
-var config = app.Services.GetRequiredService<MainConfigModel>();
+var config = app.Services.GetRequiredService<IOptions<MainConfigModel>>();
 
 
-if (config.ContentPath == null)
-    throw new NullReferenceException(nameof(config.ContentPath));
-
-if (!Directory.Exists(config.ContentPath))
-    Directory.CreateDirectory(config.ContentPath);
-
-if (!String.IsNullOrWhiteSpace(config.BasePath))
-    app.UsePathBase(config.BasePath);
+if (!String.IsNullOrWhiteSpace(config.Value.BasePath))
+{
+    Console.WriteLine("Use base path: " + config.Value.BasePath);
+    app.UsePathBase(config.Value.BasePath);
+}
 
 
 // Configure the HTTP request pipeline.
@@ -35,7 +45,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseRouting();
+
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

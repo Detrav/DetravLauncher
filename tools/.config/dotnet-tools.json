@@ -7,6 +7,12 @@
       "commands": [
         "swagger"
       ]
+    },
+    "nswag.consolecore": {
+      "version": "13.16.1",
+      "commands": [
+        "nswag"
+      ]
     }
   }
 }
