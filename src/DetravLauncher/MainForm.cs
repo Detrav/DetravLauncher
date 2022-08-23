@@ -40,6 +40,7 @@ namespace DetravLauncher
                 }
 
                 using HttpClient httpClient = new HttpClient();
+                httpClient.Timeout = TimeSpan.FromHours(1);
                 DetravLauncherClient client = new DetravLauncherClient(settings.Host, httpClient);
 
                 var files = await client.ListAsync(settings.FolderName);
