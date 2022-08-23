@@ -35,6 +35,10 @@ namespace DetravLauncher.Server.Controllers
 
             var fullPath = fileProvider.GetFile(model.Path);
 
+            var dir = Path.GetDirectoryName(fullPath);
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir!);
+
             if (model.Seek == 0)
             {
                 System.IO.File.WriteAllBytes(fullPath, model.Data);

@@ -17,6 +17,8 @@ namespace DetravLauncher
             Close();
         }
 
+        private HashSet<string> oldFiles = new HashSet<string>();
+
         private async void MainForm_Load(object sender, EventArgs e)
         {
             try
@@ -33,15 +35,28 @@ namespace DetravLauncher
 
                 var files = await client.ListAsync(settings.FolderName);
 
+
                 if (files == null)
                     throw new ArgumentNullException("Can't download list of files");
+
+                textBox1.AppendText("Download data for " + files.Files.Count + " files!" + Environment.NewLine);
+
+                Scan(settings.FolderName);
 
                 int i = 0;
                 foreach (var file in files.Files)
                 {
-                    await ScanAsync(file, httpClient, settings.Host, settings.FolderName);
+                    await ScanAsync(file, httpClient, settings.Host);
                     i++;
                     progressBar1.Value = Math.Clamp(i * 100 / files.Files.Count, 0, 100);
+                }
+
+                var trimSize = Path.GetFullPath(settings.FolderName).TrimEnd('\\', '/').Length + 1;
+
+                foreach (var file in oldFiles)
+                {
+                    File.Delete(file);
+                    textBox1.AppendText("Delete: " + file.Substring(trimSize) + Environment.NewLine);
                 }
 
                 progressBar1.Value = 100;
@@ -49,7 +64,7 @@ namespace DetravLauncher
             }
             catch (Exception ex)
             {
-                textBox1.AppendText(ex.Message + "\n");
+                textBox1.AppendText(ex.Message + Environment.NewLine);
                 BackColor = Color.DarkRed;
             }
             finally
@@ -58,10 +73,30 @@ namespace DetravLauncher
             }
         }
 
-        private async Task ScanAsync(FileModel file, HttpClient client, string host, string folderName)
+        void Scan(string folder)
+        {
+            foreach (var file in Directory.GetFiles(folder))
+            {
+                ScanFile(file);
+            }
+
+            foreach (var ch in Directory.GetDirectories(folder))
+            {
+                Scan(ch);
+            }
+        }
+
+        void ScanFile(string file)
+        {
+            oldFiles.Add(Path.GetFullPath(file));
+        }
+
+        private async Task ScanAsync(FileModel file, HttpClient client, string host)
         {
             Application.DoEvents();
-            var fullPath = Path.Combine(folderName, file.RelativePath);
+            var fullPath = Path.GetFullPath(file.RelativePath);
+
+            oldFiles.Remove(fullPath);
 
             if (File.Exists(fullPath))
             {
@@ -69,15 +104,15 @@ namespace DetravLauncher
 
                 if (hash == file.Hash && size == file.Size)
                 {
-                    textBox1.AppendText("OK: " + file.RelativePath + "\n");
+                    textBox1.AppendText("OK: " + file.RelativePath + Environment.NewLine);
                 }
             }
             Application.DoEvents();
             CheckDir(fullPath);
             Application.DoEvents();
 
-            textBox1.AppendText("Download: " + file.RelativePath);
-            var bytes = await client.GetByteArrayAsync(host + "?path=" + Uri.EscapeDataString(file.RelativePath));
+            textBox1.AppendText("Download: " + file.RelativePath + Environment.NewLine);
+            var bytes = await client.GetByteArrayAsync(host + "/update/file?path=" + Uri.EscapeDataString(file.RelativePath));
 
             Application.DoEvents();
             File.WriteAllBytes(fullPath, bytes);

@@ -7,12 +7,13 @@ if (args.Length != 3)
 }
 
 string apikey = args[1];
-string directory = Path.GetFullPath(args[2]).TrimEnd('/', '\\');
+string appdirectory = Path.GetFullPath(args[2]).TrimEnd('/', '\\');
+string directory = Path.GetDirectoryName(appdirectory)!.TrimEnd('/', '\\');
 var directoryTrimLen = directory.Length + 1;
 
-if (!Directory.Exists(directory))
+if (!Directory.Exists(appdirectory))
 {
-    throw new DirectoryNotFoundException(directory);
+    throw new DirectoryNotFoundException(appdirectory);
 }
 
 using HttpClient httpclient = new HttpClient();
@@ -52,16 +53,20 @@ void ScanFile(string file)
     }
 }
 
+Scan(appdirectory);
+
+Console.WriteLine("Found: {0} files", newFiles.Count);
+
 
 foreach (var file in newFiles)
 {
     var (hash, size) = GetMD5Checksum(file);
-    string name = file.Substring(directoryTrimLen);
+    string name = file.Substring(directoryTrimLen).Replace('\\', '/');
     if (filesModel.TryGetValue(name, out var model))
     {
+        filesModel.Remove(name);
         if (model.Hash == hash && model.Size == size)
         {
-            filesModel.Remove(name);
             Console.WriteLine("OK: " + name);
             continue;
         }
