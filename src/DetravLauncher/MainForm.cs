@@ -50,7 +50,11 @@ namespace DetravLauncher
 
                 textBox1.AppendText("Download data for " + files.Files.Count + " files!" + Environment.NewLine);
 
-                Scan(settings.FolderName);
+                string fullpathDir = Path.GetFullPath(settings.FolderName);
+
+                if (!Directory.Exists(fullpathDir))
+                    Directory.CreateDirectory(fullpathDir);
+                Scan(Path.GetFullPath(settings.FolderName));
 
                 int i = 0;
                 foreach (var file in files.Files)
@@ -75,6 +79,7 @@ namespace DetravLauncher
             catch (Exception ex)
             {
                 textBox1.AppendText(ex.Message + Environment.NewLine);
+                textBox1.AppendText(ex.StackTrace);
                 BackColor = Color.DarkRed;
             }
             finally
