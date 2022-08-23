@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace DetravLauncher
@@ -5,6 +6,7 @@ namespace DetravLauncher
     public partial class MainForm : Form
     {
         private SettingsFile? settings;
+        private bool ready;
 
         public MainForm()
         {
@@ -14,6 +16,13 @@ namespace DetravLauncher
 
         private void BtnOK_Click(object? sender, EventArgs e)
         {
+            if (ready)
+            {
+                if (!String.IsNullOrWhiteSpace(settings!.AppPath))
+                {
+                    Process.Start(Path.GetFullPath(settings!.AppPath));
+                }
+            }
             Close();
         }
 
@@ -61,6 +70,7 @@ namespace DetravLauncher
 
                 progressBar1.Value = 100;
                 BackColor = Color.DarkGreen;
+                ready = true;
             }
             catch (Exception ex)
             {

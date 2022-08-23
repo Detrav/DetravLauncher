@@ -10,5 +10,6 @@ namespace DetravLauncher
     {
         public string Host { get; set; } = "";
         public string FolderName { get; set; } = "";
+        public string AppPath { get; set; } = "";
     }
 }
