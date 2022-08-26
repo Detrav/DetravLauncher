@@ -1,0 +1,21 @@
+﻿@page
+@using Detrav.Launcher.Server.Areas.Admin.Pages
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Index">Home</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Index">Admin area</a></li>
+    </ol>
+</nav>
+
+<div class="text-center">
+    <h1 class="display-4">Admin Area</h1>
+</div>
+
+<p><a asp-page="Products/List">Products</a></p>
+<p><a asp-page="Tags/List">Tags</a></p>
+<p><a asp-page="Achievements/List">Achievements</a></p>

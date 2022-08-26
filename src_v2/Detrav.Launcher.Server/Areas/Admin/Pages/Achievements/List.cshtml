@@ -1,0 +1,48 @@
+﻿@page
+@using Detrav.Launcher.Server.Utils
+@model Detrav.Launcher.Server.Areas.Admin.Pages.Achievements.ListModel
+@{
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Index">Home</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Index">Admin area</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Achievements/List">Achievements</a></li>
+    </ol>
+</nav>
+
+@if (Model.Achievements == null || Model.Achievements.Count() == 0)
+{
+    <div class="alert alert-info" role="alert">
+        The administrator did not add Achievements here, please check back later!
+    </div>
+}
+else
+{
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var Achievement in Model.Achievements)
+            {
+                <tr>
+                    <th scope="row">@Achievement.Id</th>
+                    <td>@Achievement.Name</td>
+                    <td>@StringUtils.TrimOneLine(Achievement.Description)</td>
+                    <td>
+                        <a type="button" class="btn btn-primary" asp-page="Edit" asp-route-id="@Achievement.Id">Edit</a>
+                        <a type="button" class="btn btn-danger" asp-page="Delete" asp-route-id="@Achievement.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,71 @@
+﻿@page "{id}"
+@using Microsoft.AspNetCore.Http.Extensions
+@model Detrav.Launcher.Server.Areas.Admin.Pages.Tags.EditModel
+@{
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Index">Home</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Index">Admin area</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Tags/List">Tags</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Tags/Edit" asp-route-id="@Model.Tag?.Id">Edit - @Model.Tag?.Name</a></li>
+    </ol>
+</nav>
+
+@if (!Model.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert" asp-validation-summary="All">
+    </div>
+}
+
+@if (Model.IsSaved)
+{
+    <div class="alert alert-success" role="alert">
+        Saved!!!
+    </div>
+}
+
+
+@if (@Model.Tag != null)
+{
+    <h1 class="display-4">
+        @Model.Tag.Name
+    </h1>
+
+    <p>
+        <a type="button" class="btn btn-danger" asp-page="Delete" asp-route-id="@Model.Tag.Id">Delete</a>
+    </p>
+
+    <form method="post" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-md-12 my-3">
+                <div class="mb-3">
+                    <label asp-for="TagName" class="form-label">Name</label>
+                    <input class="form-control" asp-for="TagName">
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Description</label>
+                    <textarea class="form-control" asp-for="Description"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Products</label>
+                    @{
+                        <p>
+                            @foreach (var product in @Model.Tag.Products)
+                            {
+                                <a asp-area="Admin" asp-page="/Products/Edit" asp-route-id="@product.Id">@product.Name</a>
+                            }
+                            <a class="btn btn-info" asp-page="AddProduct" asp-route-id="@Model.Tag.Id" >Edit</a>
+                        </p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <button class="btn btn-success w-100" type="submit">Save</button>
+        </div>
+    </form>
+}

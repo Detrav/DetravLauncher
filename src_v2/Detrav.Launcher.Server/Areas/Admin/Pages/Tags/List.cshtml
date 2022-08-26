@@ -1,0 +1,53 @@
+﻿@page
+@using Detrav.Launcher.Server.Utils
+@model Detrav.Launcher.Server.Areas.Admin.Pages.Tags.ListModel
+@{
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Index">Home</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Index">Admin area</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Tags/List">Tags</a></li>
+    </ol>
+</nav>
+
+
+<p>
+    <a type="button" class="btn btn-primary" asp-page="Add">Add a new tag</a>
+</p>
+
+@if (Model.Tags == null || Model.Tags.Count() == 0)
+{
+    <div class="alert alert-info" role="alert">
+        The administrator did not add tags here, please check back later!
+    </div>
+}
+else
+{
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tag in Model.Tags)
+            {
+                <tr>
+                    <th scope="row">@tag.Id</th>
+                    <td>@tag.Name</td>
+                    <td>@StringUtils.TrimOneLine(tag.Description)</td>
+                    <td>
+                        <a type="button" class="btn btn-primary" asp-page="Edit" asp-route-id="@tag.Id">Edit</a>
+                        <a type="button" class="btn btn-danger" asp-page="Delete" asp-route-id="@tag.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

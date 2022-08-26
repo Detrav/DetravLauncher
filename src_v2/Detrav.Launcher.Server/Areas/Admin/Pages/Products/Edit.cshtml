@@ -1,0 +1,130 @@
+﻿@page "{id}"
+@model Detrav.Launcher.Server.Areas.Admin.Pages.Products.EditModel
+@{
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Index">Home</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Index">Admin area</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Products/List">Products</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Products/Edit" asp-route-id="@Model.Product?.Id">Edit - @Model.Product?.Name</a></li>
+    </ol>
+</nav>
+
+@if (!Model.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert" asp-validation-summary="All">
+    </div>
+}
+
+@if (Model.IsSaved)
+{
+    <div class="alert alert-success" role="alert">
+        Saved!!!
+    </div>
+}
+
+
+@if (@Model.Product != null)
+{
+    <h1 class="display-4">
+        @Model.Product.Name
+        @if (Model.Product.IsPublished)
+        {
+            <span class="badge bg-success">Published</span>
+        }
+        else
+        {
+            <span class="badge bg-danger">Not published</span>
+        }
+    </h1>
+
+    <p>
+        <a type="button" class="btn btn-danger" asp-page="Delete" asp-route-id="@Model.Product.Id">Delete</a>
+    </p>
+
+    <form method="post" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-md-4 my-3">
+                <div class="row">
+                    <label asp-for="Poster" class="col-12 col-form-label">
+                        <img src="~/api/Images/GetPosterFromProduct/@Model.Product.Id" class="img-fluid" alt="poster">
+                    </label>
+                    <div class="col-12">
+                        <input class="form-control" asp-for="Poster" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8 my-3">
+                <div class="mb-3">
+                    <label asp-for="ProductName" class="form-label">Name</label>
+                    <input class="form-control" asp-for="ProductName">
+                </div>
+                <div class="mb-3">
+                    <input class="form-check-input" type="checkbox" asp-for="IsPublished">
+                    <label class="form-check-label" asp-for="IsPublished">Is product published for user?</label>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Description</label>
+                    <textarea class="form-control" asp-for="Description"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Achievements</label>
+                    @{
+                        <p>
+                            @foreach (var ach in @Model.Product.Achievements)
+                            {
+                                <a asp-area="Admin" asp-page="/Achievements/Edit" asp-route-id="@ach.Id">@ach.Name</a>
+                            }
+                            <a asp-area="Admin" asp-page="/Achievements/Add" asp-route-productId="@Model.Product.Id" class="btn btn-info">Add</a>
+                        </p>
+                    }
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Tags</label>
+                    @{
+                        <p>
+                            @foreach (var tag in @Model.Product.Tags)
+                            {
+                                <a asp-area="Admin" asp-page="/Tags/Edit" asp-route-id="@tag.Id">@tag.Name</a>
+                            }
+                            <a asp-page="AddTag" asp-route-id="@Model.Product.Id" class="btn btn-info">Edit</a>
+                        </p>
+                    }
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Versions</label>
+                    @{
+                        <p>
+                            @foreach (var ver in @Model.Product.Versions)
+                            {
+                                <a href="#">@ver.Version</a>
+                                <a href="#" class="btn btn-sm btn-danger">X</a>
+                            }
+                            <a href="#" class="btn btn-info">Add</a>
+                        </p>
+                    }
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Screenshots</label>
+                    @{
+                        <p>
+                            @foreach (var screenshot in @Model.Product.Screenshots)
+                            {
+                                <a href="#">@screenshot.Name</a>
+                                <a href="#" class="btn btn-sm btn-danger">X</a>
+                            }
+                            <a href="#" class="btn btn-info">Add</a>
+                        </p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <button class="btn btn-success w-100" type="submit">Save</button>
+        </div>
+    </form>
+}

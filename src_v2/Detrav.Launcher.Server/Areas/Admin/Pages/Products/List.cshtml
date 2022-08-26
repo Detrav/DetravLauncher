@@ -1,0 +1,53 @@
+﻿@page
+@using Detrav.Launcher.Server.Utils
+@model Detrav.Launcher.Server.Areas.Admin.Pages.Products.ListModel
+@{
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Index">Home</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Index">Admin area</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Products/List">Products</a></li>
+    </ol>
+</nav>
+
+
+<p>
+    <a type="button" class="btn btn-primary" asp-page="Add">Add a new Product</a>
+</p>
+
+@if (Model.Products == null || Model.Products.Count() == 0)
+{
+    <div class="alert alert-info" role="alert">
+        The administrator did not add products here, please check back later!
+    </div>
+}
+else
+{
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Model.Products)
+            {
+                <tr>
+                    <th scope="row">@product.Id</th>
+                    <td>@product.Name</td>
+                    <td>@StringUtils.TrimOneLine(product.Description)</td>
+                    <td>
+                        <a type="button" class="btn btn-primary" asp-page="Edit" asp-route-id="@product.Id">Edit</a>
+                        <a type="button" class="btn btn-danger" asp-page="Delete" asp-route-id="@product.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

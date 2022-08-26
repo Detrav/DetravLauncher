@@ -1,0 +1,38 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<style>
+    .card-body-over {
+        position: absolute;
+        bottom: 0;
+        background: rgba(255,255,255,.8);
+        width: 100%;
+    }
+</style>
+
+@if (@Model.Products == null || @Model.Products.Count() == 0)
+{
+    <div class="alert alert-info" role="alert">
+        The administrator did not add products here, please check back later!
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var product in @Model.Products)
+        {
+            <div class="col-md-4 col-lg-3 my-3">
+                <a class="card" asp-page="Product" asp-route-id="@product.Id">
+
+                    <img src="~/api/Images/GetPosterFromProduct/@product.Id" class="card-img-top" alt="poster">
+                    <div class="card-body card-body-over">
+                        <h5 class="card-title text-black">@product.Name</h5>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+}
