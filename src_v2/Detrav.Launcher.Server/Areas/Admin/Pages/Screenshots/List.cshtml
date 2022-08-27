@@ -1,6 +1,6 @@
 ﻿@page
 @using Detrav.Launcher.Server.Utils
-@model Detrav.Launcher.Server.Areas.Admin.Pages.Tags.ListModel
+@model Detrav.Launcher.Server.Areas.Admin.Pages.Screenshots.ListModel
 @{
 }
 
@@ -8,19 +8,14 @@
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a asp-area="" asp-page="/Index">Home</a></li>
         <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Index">Admin area</a></li>
-        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Tags/List">Tags</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Screenshots/List">Screenshots</a></li>
     </ol>
 </nav>
 
-
-<p>
-    <a type="button" class="btn btn-primary" asp-page="Add">Add a new tag</a>
-</p>
-
-@if (Model.Tags == null || Model.Tags.Count() == 0)
+@if (Model.Screenshots == null || Model.Screenshots.Count() == 0)
 {
     <div class="alert alert-info" role="alert">
-        The administrator did not add tags here, please check back later!
+        The administrator did not add Screenshots here, please check back later!
     </div>
 }
 else
@@ -36,15 +31,15 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var tag in Model.Tags)
+            @foreach (var Screenshot in Model.Screenshots)
             {
                 <tr>
-                    <th scope="row">@tag.Id</th>
-                    <td>@tag.Name</td>
-                    <td>@AppUtils.TrimOneLine(tag.Description)</td>
+                    <th scope="row">@Screenshot.Id</th>
+                    <td>@Screenshot.Name</td>
+                    <td>@AppUtils.TrimOneLine(Screenshot.Description)</td>
                     <td>
-                        <a type="button" class="btn btn-primary" asp-page="Edit" asp-route-id="@tag.Id">Edit</a>
-                        <a type="button" class="btn btn-danger" asp-page="Delete" asp-route-id="@tag.Id">Delete</a>
+                        <a type="button" class="btn btn-primary" asp-page="Edit" asp-route-id="@Screenshot.Id">Edit</a>
+                        <a type="button" class="btn btn-danger" asp-page="Delete" asp-route-id="@Screenshot.Id">Delete</a>
                     </td>
                 </tr>
             }

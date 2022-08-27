@@ -36,7 +36,7 @@ else
                 <tr>
                     <th scope="row">@Achievement.Id</th>
                     <td>@Achievement.Name</td>
-                    <td>@StringUtils.TrimOneLine(Achievement.Description)</td>
+                    <td>@AppUtils.TrimOneLine(Achievement.Description)</td>
                     <td>
                         <a type="button" class="btn btn-primary" asp-page="Edit" asp-route-id="@Achievement.Id">Edit</a>
                         <a type="button" class="btn btn-danger" asp-page="Delete" asp-route-id="@Achievement.Id">Delete</a>

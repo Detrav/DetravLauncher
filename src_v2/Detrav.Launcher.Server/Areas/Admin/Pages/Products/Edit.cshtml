@@ -100,10 +100,9 @@
                         <p>
                             @foreach (var ver in @Model.Product.Versions)
                             {
-                                <a href="#">@ver.Version</a>
-                                <a href="#" class="btn btn-sm btn-danger">X</a>
+                                <a asp-area="Admin" asp-page="/Versions/Edit" asp-route-id="@ver.Id">@ver.Version</a>
                             }
-                            <a href="#" class="btn btn-info">Add</a>
+                            <a asp-area="Admin" asp-page="/Versions/Add" asp-route-productId="@Model.Product.Id" class="btn btn-info">Add</a>
                         </p>
                     }
                 </div>
@@ -113,10 +112,9 @@
                         <p>
                             @foreach (var screenshot in @Model.Product.Screenshots)
                             {
-                                <a href="#">@screenshot.Name</a>
-                                <a href="#" class="btn btn-sm btn-danger">X</a>
+                                <a asp-area="Admin" asp-page="/Screenshots/Edit" asp-route-id="@screenshot.Id">@screenshot.Name</a>
                             }
-                            <a href="#" class="btn btn-info">Add</a>
+                            <a asp-area="Admin" asp-page="/Screenshots/Add" asp-route-productId="@Model.Product.Id" class="btn btn-info">Add</a>
                         </p>
                     }
                 </div>

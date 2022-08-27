@@ -110,7 +110,16 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Achievements
                 if (aIcon != null && aIcon.Length > 0)
                 {
                     await fileService.RemoveAsync(achievement.Icon);
-                    achievement.Icon = await fileService.StoreAsync(Icon!.FileName, aIcon);
+                    string? fileName = Icon?.FileName;
+                    if (String.IsNullOrWhiteSpace(fileName))
+                    {
+                        fileName = Guid.NewGuid() + ".unk";
+                    }
+                    else
+                    {
+                        fileName = Guid.NewGuid() + Path.GetExtension(fileName);
+                    }
+                    achievement.Icon = await fileService.StoreAsync("Achievements", fileName, aIcon);
                 }
 
                 await context.SaveChangesAsync();

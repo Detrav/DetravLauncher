@@ -1,0 +1,28 @@
+﻿@page "{productId}"
+@using Detrav.Launcher.Server.Utils
+@model Detrav.Launcher.Server.Areas.Admin.Pages.Versions.AddModel
+@{
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Index">Home</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Index">Admin area</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Versions/List">Versions</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Versions/Add" asp-route-productId="@Model.ProductId">Add</a></li>
+    </ol>
+</nav>
+
+
+<p>
+    For create a new version upload it with a command!
+</p>
+
+<pre>
+    DetravLauncher.Uploader.exe "{Url}" "{version}" "{ApiKey}"
+    DetravLauncher.Uploader.exe "@AppUtils.AbsoluteUrlPrefix(Request,"/api/ProductVersion/UploadFile")" "1.0.0" "@Model.ApiKey"
+</pre>
+
+<form method="post">
+    <button type="submit">Generate a new ApiKey</button>
+</form>

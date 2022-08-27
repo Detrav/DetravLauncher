@@ -7,9 +7,10 @@ namespace Detrav.Launcher.Server.Services
 {
     public interface IFileService
     {
-        Task<FileModel> StoreAsync(string path, byte[] bytes, bool autoSave = false);
+        Task<FileModel> StoreAsync(string collection, string path, byte[] bytes, bool autoSave = false);
         Task<byte[]> GetAsync(int fileId);
         Task<bool> RemoveAsync(FileModel? poster, bool autoSave = false);
+        Task<FileModel> StoreWithAutoSaveAsync(string collection, string filePath, Stream body);
     }
     public class FileService : IFileService
     {
@@ -38,7 +39,7 @@ namespace Detrav.Launcher.Server.Services
             return result;
         }
 
-        public async Task<FileModel> StoreAsync(string path, byte[] bytes, bool autoSave = false)
+        public async Task<FileModel> StoreAsync(string collection, string path, byte[] bytes, bool autoSave = false)
         {
             if (String.IsNullOrWhiteSpace(path))
                 throw new ArgumentNullException(nameof(path));
@@ -48,8 +49,8 @@ namespace Detrav.Launcher.Server.Services
             FileModel model = new FileModel();
 
             model.Path = path;
-            model.Hash = CreateMD5(bytes);
             model.Size = bytes.LongLength;
+            model.Collection = collection;
 
             for (long i = 0; i < bytes.LongLength; i += BlobSize)
             {
@@ -101,7 +102,7 @@ namespace Detrav.Launcher.Server.Services
                 BlobModel blob = new BlobModel();
                 blob.Hash = md5;
                 blob.Size = block.Length;
-                blob.Data = block;
+                blob.Data = block.ToArray();
 
                 var result = new FileBlobModel()
                 {
@@ -146,6 +147,51 @@ namespace Detrav.Launcher.Server.Services
                 return true;
             }
             return false;
+        }
+
+        public async Task<FileModel> StoreWithAutoSaveAsync(string collection, string filePath, Stream body)
+        {
+
+            var file = new FileModel()
+            {
+                Path = filePath,
+                Collection = collection
+            };
+
+            context.Files.Add(file);
+
+            await context.SaveChangesAsync();
+
+            byte[] buffer = new byte[BlobSize];
+            int offset = 0;
+            long globalOffset = 0;
+            while (true)
+            {
+                var readBytes = await body.ReadAsync(buffer, offset, BlobSize - offset);
+                offset += readBytes;
+                if (readBytes == 0)
+                {
+                    if (offset > 0)
+                    {
+                        await StoreBlobAsync(buffer.Take(offset).ToArray(), globalOffset, file, true);
+                        globalOffset += offset;
+                    }
+                    break;
+                }
+                else if (offset == BlobSize)
+                {
+                    await StoreBlobAsync(buffer, globalOffset, file, true);
+                    globalOffset += offset;
+                    offset = 0;
+                }
+            }
+
+            file.Size = globalOffset;
+
+            await context.SaveChangesAsync();
+
+            return file;
+
         }
     }
 }

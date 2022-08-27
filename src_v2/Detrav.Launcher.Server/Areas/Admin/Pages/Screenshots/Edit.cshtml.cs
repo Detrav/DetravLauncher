@@ -9,8 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp;
 using System.ComponentModel.DataAnnotations;
 
-
-namespace Detrav.Launcher.Server.Areas.Admin.Pages.Products
+namespace Detrav.Launcher.Server.Areas.Admin.Pages.Screenshots
 {
     [Authorize(Policy = AppConstants.RequireAdministratorRole)]
     public class EditModel : PageModel
@@ -19,21 +18,22 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Products
         [Required]
         [BindProperty]
         [Display(Name = "Name")]
-        public string? ProductName { get; set; }
+        public string? ScreenshotName { get; set; }
 
         [Required]
         [BindProperty]
         public string? Description { get; set; }
 
-        [BindProperty]
-        public bool IsPublished { get; set; }
 
         [BindProperty]
-        public IFormFile? Poster { get; set; }
+        public IFormFile? Data { get; set; }
+
+        public bool IsSaved { get; set; }
 
         private readonly ILogger<IndexModel> logger;
         private readonly ApplicationDbContext context;
         private readonly IFileService fileService;
+
 
         public EditModel(ILogger<IndexModel> logger, ApplicationDbContext context, IFileService fileService)
         {
@@ -42,72 +42,71 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Products
             this.fileService = fileService;
         }
 
-        public ProductModel? Product { get; private set; }
-        public bool IsSaved { get; private set; }
+        public ScreenshotModel? Screenshot { get; private set; }
 
         public async Task<ActionResult> OnGetAsync(int id)
         {
-            await UpdateProduct(id);
-            if (Product == null)
+            await UpdateScreenshot(id);
+            if (Screenshot == null)
             {
                 return NotFound();
             }
 
-            ProductName = Product.Name;
-            Description = Product.Description;
-            IsPublished = Product.IsPublished;
+            ScreenshotName = Screenshot.Name;
+            Description = Screenshot.Description;
+
 
             return Page();
         }
 
-        private async Task UpdateProduct(int id)
+        private async Task UpdateScreenshot(int id)
         {
-            Product = await context.Products
-                .Include(m => m.Tags)
-                .Include(m => m.Screenshots)
-                .Include(m => m.Versions)
-                .Include(m => m.Achievements)
+            Screenshot = await context.Screenshots
+                .Include(m => m.Product)
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
 
         public async Task<ActionResult> OnPostAsync(int id)
         {
-            byte[]? aPoster = null;
+
+
+
+            var screenshot = await context.Screenshots.Include(m => m.Data).FirstOrDefaultAsync(m => m.Id == id);
+            if (screenshot == null)
+            {
+                return NotFound();
+            }
+
+            byte[]? aData = null;
             try
             {
-                if (Poster != null && Poster.Length > 0)
+                if (Data != null && Data.Length > 0)
                 {
                     using var ms = new MemoryStream();
-                    Poster.CopyTo(ms);
-                    aPoster = ms.ToArray();
-                    using Image image = Image.Load(aPoster);
+                    Data.CopyTo(ms);
+                    aData = ms.ToArray();
+                    using Image image = Image.Load(aData);
                     var size = image.Size();
-                    if (Math.Abs((float)size.Height / (float)size.Width - 1.6) > 0.1)
-                    {
-                        ModelState.AddModelError(nameof(Poster), "Poster must be image with format 10x16! The best size is 500x800!");
-                    }
+                    //if (Math.Abs(size.Height / size.Width - 1.0) > 0.01)
+                    //{
+                    //    ModelState.AddModelError(nameof(Data), "Icon must be image with format 1x1! The best size is 256x256!");
+                    //}
 
                 }
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(nameof(Poster), ex.Message);
-            }
-            var product = await context.Products.Include(m => m.Poster).FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
-            {
-                return NotFound();
+                ModelState.AddModelError(nameof(Data), ex.Message);
             }
 
             if (ModelState.IsValid)
             {
-                product.Name = ProductName;
-                product.Description = Description;
-                product.IsPublished = IsPublished;
-                if (aPoster != null && aPoster.Length > 0)
+                screenshot.Name = ScreenshotName;
+                screenshot.Description = Description;
+                if (aData != null && aData.Length > 0)
                 {
-                    await fileService.RemoveAsync(product.Poster);
-                    string? fileName = Poster?.FileName;
+                    await fileService.RemoveAsync(screenshot.Data);
+                    string? fileName = Data?.FileName;
                     if (String.IsNullOrWhiteSpace(fileName))
                     {
                         fileName = Guid.NewGuid() + ".unk";
@@ -116,17 +115,19 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Products
                     {
                         fileName = Guid.NewGuid() + Path.GetExtension(fileName);
                     }
-                    product.Poster = await fileService.StoreAsync("Posters", fileName, aPoster);
+                    screenshot.Data = await fileService.StoreAsync("Screenshots", fileName, aData);
                 }
+
                 await context.SaveChangesAsync();
                 IsSaved = true;
             }
 
-            await UpdateProduct(id);
-            if (Product == null)
+            await UpdateScreenshot(id);
+            if (Screenshot == null)
             {
                 return NotFound();
             }
+
 
             return Page();
         }

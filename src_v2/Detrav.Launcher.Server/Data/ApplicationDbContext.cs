@@ -12,6 +12,7 @@ namespace Detrav.Launcher.Server.Data
         public DbSet<FileModel> Files { get; set; }
         public DbSet<ProductUserModel> ProductUsers { get; set; }
         public DbSet<ProductVersionModel> Versions { get; set; }
+        public DbSet<ProductVersionFileModel> VersionFiles { get; set; }
         public DbSet<ScreenshotModel> Screenshots { get; set; }
         public DbSet<TagModel> Tags { get; set; }
         public DbSet<FileBlobModel> FileBlobs { get; set; }
@@ -33,6 +34,9 @@ namespace Detrav.Launcher.Server.Data
 
             builder.Entity<FileBlobModel>()
                 .HasKey(t => new { t.FileId, t.BlobId });
+
+            builder.Entity<ProductVersionFileModel>()
+               .HasKey(t => new { t.FileId, t.VersionId });
         }
     }
 }

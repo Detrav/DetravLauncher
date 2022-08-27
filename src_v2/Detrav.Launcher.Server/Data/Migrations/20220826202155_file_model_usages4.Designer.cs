@@ -4,6 +4,7 @@ using Detrav.Launcher.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Detrav.Launcher.Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220826202155_file_model_usages4")]
+    partial class file_model_usages4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,11 +145,6 @@ namespace Detrav.Launcher.Server.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Collection")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -160,18 +157,17 @@ namespace Detrav.Launcher.Server.Data.Migrations
                     b.Property<string>("EditorId")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Hash")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Path")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("Size")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Path", "Collection")
-                        .IsUnique();
 
                     b.ToTable("Files");
                 });
@@ -183,9 +179,6 @@ namespace Detrav.Launcher.Server.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("ApiKey")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -213,8 +206,6 @@ namespace Detrav.Launcher.Server.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApiKey");
 
                     b.HasIndex("PosterId");
 
@@ -257,14 +248,17 @@ namespace Detrav.Launcher.Server.Data.Migrations
                     b.Property<int>("FileId")
                         .HasColumnType("int");
 
-                    b.Property<int>("VersionId")
+                    b.Property<int>("VerionId")
                         .HasColumnType("int");
 
-                    b.HasKey("FileId", "VersionId");
+                    b.Property<int?>("VersionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("FileId", "VerionId");
 
                     b.HasIndex("VersionId");
 
-                    b.ToTable("VersionFiles");
+                    b.ToTable("ProductVersionFileModel");
                 });
 
             modelBuilder.Entity("Detrav.Launcher.Server.Data.Models.ProductVersionModel", b =>
@@ -287,12 +281,6 @@ namespace Detrav.Launcher.Server.Data.Migrations
                     b.Property<string>("EditorId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsBeta")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPublished")
-                        .HasColumnType("bit");
-
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
@@ -301,14 +289,11 @@ namespace Detrav.Launcher.Server.Data.Migrations
 
                     b.Property<string>("Version")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
-
-                    b.HasIndex("Version");
 
                     b.ToTable("Versions");
                 });
@@ -703,9 +688,7 @@ namespace Detrav.Launcher.Server.Data.Migrations
 
                     b.HasOne("Detrav.Launcher.Server.Data.Models.ProductVersionModel", "Version")
                         .WithMany("Files")
-                        .HasForeignKey("VersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("VersionId");
 
                     b.Navigation("File");
 

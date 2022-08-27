@@ -1,6 +1,6 @@
 ﻿namespace Detrav.Launcher.Server.Utils
 {
-    public static class StringUtils
+    public static class AppUtils
     {
         public static string TrimOneLine(string? str)
         {
@@ -12,6 +12,11 @@
             // TODO trim ... len
 
             return line;
+        }
+
+        public static string AbsoluteUrlPrefix(HttpRequest request, string path)
+        {
+            return request.Scheme + "://" + request.Host + request.PathBase + path;
         }
     }
 }

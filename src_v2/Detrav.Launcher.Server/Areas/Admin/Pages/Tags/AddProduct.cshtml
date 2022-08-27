@@ -46,7 +46,7 @@
                     <tr>
                         <th scope="row">@product.Id</th>
                         <td>@product.Name</td>
-                        <td>@StringUtils.TrimOneLine(product.Description)</td>
+                        <td>@AppUtils.TrimOneLine(product.Description)</td>
                         <td>
                             @{
                                 var flagHasProd = Model.Tag.Products.Any(m => m.Id == product.Id);

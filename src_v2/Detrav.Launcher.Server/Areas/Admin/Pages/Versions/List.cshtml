@@ -1,0 +1,48 @@
+﻿@page
+@using Detrav.Launcher.Server.Utils
+@model Detrav.Launcher.Server.Areas.Admin.Pages.Versions.ListModel
+@{
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Index">Home</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Index">Admin area</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Versions/List">Versions</a></li>
+    </ol>
+</nav>
+
+@if (Model.Versions == null || Model.Versions.Count() == 0)
+{
+    <div class="alert alert-info" role="alert">
+        The administrator did not add verions here, please check back later!
+    </div>
+}
+else
+{
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Product</th>
+                <th scope="col">Version</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var version in Model.Versions)
+            {
+                <tr>
+                    <th scope="row">@version.Id</th>
+                    <td>@version.Product?.Name</td>
+                    <td>@AppUtils.TrimOneLine(version.Version)</td>
+                    <td>
+                        <a type="button" class="btn btn-primary" asp-page="Edit" asp-route-id="@version.Id">Edit</a>
+                        <a type="button" class="btn btn-danger" asp-page="Delete" asp-route-id="@version.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

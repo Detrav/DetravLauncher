@@ -1,0 +1,29 @@
+﻿@page "{id}"
+@model Detrav.Launcher.Server.Areas.Admin.Pages.Screenshots.DeleteModel
+@{
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Index">Home</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Index">Admin area</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Screenshots/List">Screenshots</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Screenshots/Delete" asp-route-id="@Model.Screenshot?.Id">Delete - @Model.Screenshot?.Name</a></li>
+    </ol>
+</nav>
+
+@if (@Model.Screenshot != null)
+{
+    <h1 class="display-4">
+        @Model.Screenshot.Name
+    </h1>
+    <h2 class="text-center">
+        Are you sure you want to delete?<br />
+        This action cannot be undone!
+    </h2>
+    <p>
+        <form method="post">
+            <button class="btn btn-danger w-100" type="submit">Delete</button>
+        </form>
+    </p>
+}

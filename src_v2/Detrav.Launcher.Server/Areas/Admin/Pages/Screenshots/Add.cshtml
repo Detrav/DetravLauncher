@@ -1,0 +1,41 @@
+﻿@page "{productId}"
+@model Detrav.Launcher.Server.Areas.Admin.Pages.Screenshots.AddModel
+@{
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Index">Home</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Index">Admin area</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Screenshots/List">Screenshots</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Screenshots/Add" asp-route-productId="@Model.ProductId">Add</a></li>
+    </ol>
+</nav>
+
+
+@if (!Model.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert" asp-validation-summary="All">
+    </div>
+}
+
+
+<form method="post" enctype="multipart/form-data">
+    <div class="mb-3 row">
+        <label asp-for="ScreenshotName" class="col-md-2 col-form-label">Name</label>
+        <div class="col-md-10">
+            <input type="text" class="form-control" asp-for="ScreenshotName">
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label asp-for="Description" class="col-md-2 col-form-label">Description</label>
+        <div class="col-md-10">
+            <textarea class="form-control" asp-for="Description"></textarea>
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <div class="col-12">
+            <button class="btn btn-success w-100" type="submit">Add</button>
+        </div>
+    </div>
+</form>
