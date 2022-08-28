@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Detrav.Launcher.Client": {
+      "commandName": "Project",
+      "commandLineArgs": "123 https://localhost:7265"
+    }
+  }
+}

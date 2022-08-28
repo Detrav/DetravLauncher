@@ -46,7 +46,7 @@
 
                 @if ((Model.ProductUserLibrary?.IsOwner).GetValueOrDefault())
                 {
-                    <div class="btn btn-warning w-100">Install</div>
+                    <a class="btn btn-warning w-100" href="~/api/InstallerDownload/launcher.zip" >Install</a>
                 }
                 else if (Model.Product.DistributionType == ProductDistributionType.Paid && (Model.ProductUserLibrary?.IsRequest).GetValueOrDefault())
                 {

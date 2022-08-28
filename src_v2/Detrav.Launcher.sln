@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Detrav.Launcher.Uploader", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Detrav.Launcher.Client", "Detrav.Launcher.Client\Detrav.Launcher.Client.csproj", "{7BDD95C8-9F87-448E-BE8E-F7E8D075DD71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Detrav.Launcher.Client.Launhcer", "Detrav.Launcher.Client.Launhcer\Detrav.Launcher.Client.Launhcer.csproj", "{4B1EC8A9-7B4E-497F-96B6-D9C6F1D711DB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Detrav.Launcher.Client.Launcher", "Detrav.Launcher.Client.Launcher\Detrav.Launcher.Client.Launcher.csproj", "{1DE34673-BD11-4981-91F8-76E2B1217C6A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{7BDD95C8-9F87-448E-BE8E-F7E8D075DD71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BDD95C8-9F87-448E-BE8E-F7E8D075DD71}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BDD95C8-9F87-448E-BE8E-F7E8D075DD71}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4B1EC8A9-7B4E-497F-96B6-D9C6F1D711DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4B1EC8A9-7B4E-497F-96B6-D9C6F1D711DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4B1EC8A9-7B4E-497F-96B6-D9C6F1D711DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4B1EC8A9-7B4E-497F-96B6-D9C6F1D711DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DE34673-BD11-4981-91F8-76E2B1217C6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DE34673-BD11-4981-91F8-76E2B1217C6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DE34673-BD11-4981-91F8-76E2B1217C6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DE34673-BD11-4981-91F8-76E2B1217C6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

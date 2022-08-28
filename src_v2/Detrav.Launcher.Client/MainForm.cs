@@ -6,14 +6,14 @@ namespace Detrav.Launcher.Client
 {
     public partial class MainForm : Form
     {
-        private MainConfig config;
+        private string appUrl;
         private WebView2 webView;
 
         public MainForm()
         {
             InitializeComponent();
 
-            config = JsonSerializer.Deserialize<MainConfig>(File.ReadAllText("settings.json")) ?? new MainConfig();
+            appUrl = Environment.GetCommandLineArgs()[2];
             webView = new WebView2();
             webView.Dock = DockStyle.Fill;
             webView.Parent = this;
@@ -40,7 +40,7 @@ namespace Detrav.Launcher.Client
             {
                 if (!e.IsSuccess)
                 {
-                    webView.CoreWebView2.NavigateToString(File.ReadAllText("Pages/NotFound.html").Replace("__main_uri__", config.AppUrl));
+                    webView.CoreWebView2.NavigateToString(File.ReadAllText("Pages/NotFound.html").Replace("__main_uri__", appUrl));
                 }
             }
         }
@@ -51,7 +51,7 @@ namespace Detrav.Launcher.Client
             {
 
             }
-            else if (e.Uri.StartsWith(config.AppUrl))
+            else if (e.Uri.StartsWith(appUrl))
             {
 
             }
@@ -81,9 +81,7 @@ namespace Detrav.Launcher.Client
 
         private void MainForm_Shown(object? sender, EventArgs e)
         {
-
-            webView.Source = new Uri(config.AppUrl);
-
+            webView.Source = new Uri(appUrl);
         }
     }
 }
