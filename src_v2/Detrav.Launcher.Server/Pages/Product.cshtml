@@ -1,4 +1,85 @@
 ﻿@page "{id}"
+@using Detrav.Launcher.Server.Data.Enums
 @model Detrav.Launcher.Server.Pages.ProductViewModel
 @{
+}
+
+<style>
+
+    .img-screenshot {
+        display: block;
+        max-width: 230px;
+        max-height: 95px;
+        width: auto;
+        height: auto;
+    }
+
+    .card-body-poster {
+        aspect-ratio: 10 / 16;
+        background-size: cover;
+        background-position: center center;
+    }
+</style>
+
+@if (@Model.Product != null)
+{
+    <h1 class="display-4">
+        @Model.Product.Name
+    </h1>
+
+    <div class="row">
+        <div class="col-md-4 my-3">
+            <div class="card-body-poster" style="background-image: url(@Url.Content("~/api/Images/GetPosterFromProduct/" + @Model.Product.Id))"></div>
+        </div>
+        <div class="col-md-8 my-3">
+            <div class="mb-3">
+                @Html.Raw(Model.Product.Description);
+            </div>
+            <div class="mb-3">
+                @foreach (var tag in @Model.Product.Tags)
+                {
+                    <span class="badge bg-secondary">@tag.Name</span>
+                }
+            </div>
+
+            <div class="mb-3">
+
+                @if ((Model.ProductUserLibrary?.IsOwner).GetValueOrDefault())
+                {
+                    <div class="btn btn-warning w-100">Install</div>
+                }
+                else if (Model.Product.DistributionType == ProductDistributionType.Paid && (Model.ProductUserLibrary?.IsRequest).GetValueOrDefault())
+                {
+                    <div class="btn btn-info w-100">Already requested!</div>
+                }
+                else
+                {
+                    <form asp-page-handler="addtolibrary" method="post">
+                        @switch (Model.Product.DistributionType)
+                        {
+                            case ProductDistributionType.None:
+                                <div class="btn btn-success w-100" type="submit">The author is not sure how he wants to distribute the product, check back later!</div>
+                                break;
+                            case ProductDistributionType.CommingSoon:
+                                <div class="btn btn-success w-100" type="submit">Comming soon</div>
+                                break;
+                            case ProductDistributionType.Paid:
+                                <button class="btn btn-success w-100" type="submit">Request access</button>
+                                break;
+                            case ProductDistributionType.Free:
+                                <button class="btn btn-success w-100" type="submit">Add to my library</button>
+                                break;
+                        }
+                    </form>
+                }
+            </div>
+            <div class="mb-3">
+                @foreach (var screenshot in Model.Product.Screenshots)
+                {
+                    <img class="img-screenshot" src="~/api/Images/GetDataFromScreenshot/@screenshot.Id" />
+                }
+            </div>
+
+        </div>
+    </div>
 }

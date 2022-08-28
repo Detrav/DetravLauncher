@@ -15,6 +15,7 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Versions
 
         public int ProductId { get; set; }
         public string? ApiKey { get; set; }
+        public string? Folder { get; set; }
 
 
         private readonly ILogger<IndexModel> logger;
@@ -42,6 +43,7 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Versions
             }
 
             ApiKey = product.ApiKey;
+            Folder = String.IsNullOrWhiteSpace(product.InstallFolder) ? product.Name : product.InstallFolder;
 
             return Page();
         }
@@ -59,6 +61,7 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Versions
             await context.SaveChangesAsync();
 
             ApiKey = product.ApiKey;
+            Folder = String.IsNullOrWhiteSpace(product.InstallFolder) ? product.Name : product.InstallFolder;
 
             return Page();
         }

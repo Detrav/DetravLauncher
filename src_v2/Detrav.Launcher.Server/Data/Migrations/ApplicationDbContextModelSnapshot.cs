@@ -60,8 +60,8 @@ namespace Detrav.Launcher.Server.Data.Migrations
                     b.Property<string>("EditorId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("IconId")
-                        .HasColumnType("int");
+                    b.Property<string>("IconFilePath")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsHidden")
                         .HasColumnType("bit");
@@ -74,8 +74,6 @@ namespace Detrav.Launcher.Server.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IconId");
 
                     b.HasIndex("ProductId");
 
@@ -132,6 +130,9 @@ namespace Detrav.Launcher.Server.Data.Migrations
 
                     b.HasIndex("BlobId");
 
+                    b.HasIndex("Seek", "FileId")
+                        .IsUnique();
+
                     b.ToTable("FileBlobs");
                 });
 
@@ -170,6 +171,10 @@ namespace Detrav.Launcher.Server.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Collection");
+
+                    b.HasIndex("Path");
+
                     b.HasIndex("Path", "Collection")
                         .IsUnique();
 
@@ -196,10 +201,16 @@ namespace Detrav.Launcher.Server.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("DistributionType")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("EditedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("EditorId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InstallFolder")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsPublished")
@@ -209,16 +220,38 @@ namespace Detrav.Launcher.Server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PosterId")
-                        .HasColumnType("int");
+                    b.Property<string>("PosterFilePath")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ApiKey");
 
-                    b.HasIndex("PosterId");
-
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("Detrav.Launcher.Server.Data.Models.ProductUserLibraryModel", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsOwner")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRequest")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsWishlist")
+                        .HasColumnType("bit");
+
+                    b.HasKey("ProductId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ProductUserLibraries");
                 });
 
             modelBuilder.Entity("Detrav.Launcher.Server.Data.Models.ProductUserModel", b =>
@@ -252,21 +285,6 @@ namespace Detrav.Launcher.Server.Data.Migrations
                     b.ToTable("ProductUsers");
                 });
 
-            modelBuilder.Entity("Detrav.Launcher.Server.Data.Models.ProductVersionFileModel", b =>
-                {
-                    b.Property<int>("FileId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VersionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("FileId", "VersionId");
-
-                    b.HasIndex("VersionId");
-
-                    b.ToTable("VersionFiles");
-                });
-
             modelBuilder.Entity("Detrav.Launcher.Server.Data.Models.ProductVersionModel", b =>
                 {
                     b.Property<int>("Id")
@@ -296,9 +314,6 @@ namespace Detrav.Launcher.Server.Data.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<long>("Size")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Version")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -327,9 +342,6 @@ namespace Detrav.Launcher.Server.Data.Migrations
                     b.Property<string>("CreatorId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("DataId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -337,6 +349,9 @@ namespace Detrav.Launcher.Server.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("EditorId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -347,8 +362,6 @@ namespace Detrav.Launcher.Server.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DataId");
 
                     b.HasIndex("ProductId");
 
@@ -592,21 +605,6 @@ namespace Detrav.Launcher.Server.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ProductModelProductUserModel", b =>
-                {
-                    b.Property<int>("ProductUsersId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductUsersId", "ProductsId");
-
-                    b.HasIndex("ProductsId");
-
-                    b.ToTable("ProductModelProductUserModel");
-                });
-
             modelBuilder.Entity("ProductModelTagModel", b =>
                 {
                     b.Property<int>("ProductsId")
@@ -639,17 +637,11 @@ namespace Detrav.Launcher.Server.Data.Migrations
 
             modelBuilder.Entity("Detrav.Launcher.Server.Data.Models.AchievementModel", b =>
                 {
-                    b.HasOne("Detrav.Launcher.Server.Data.Models.FileModel", "Icon")
-                        .WithMany()
-                        .HasForeignKey("IconId");
-
                     b.HasOne("Detrav.Launcher.Server.Data.Models.ProductModel", "Product")
                         .WithMany("Achievements")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Icon");
 
                     b.Navigation("Product");
                 });
@@ -673,13 +665,23 @@ namespace Detrav.Launcher.Server.Data.Migrations
                     b.Navigation("File");
                 });
 
-            modelBuilder.Entity("Detrav.Launcher.Server.Data.Models.ProductModel", b =>
+            modelBuilder.Entity("Detrav.Launcher.Server.Data.Models.ProductUserLibraryModel", b =>
                 {
-                    b.HasOne("Detrav.Launcher.Server.Data.Models.FileModel", "Poster")
-                        .WithMany()
-                        .HasForeignKey("PosterId");
+                    b.HasOne("Detrav.Launcher.Server.Data.Models.ProductModel", "Product")
+                        .WithMany("Users")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Poster");
+                    b.HasOne("Detrav.Launcher.Server.Data.Models.ProductUserModel", "User")
+                        .WithMany("Products")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Detrav.Launcher.Server.Data.Models.ProductUserModel", b =>
@@ -691,25 +693,6 @@ namespace Detrav.Launcher.Server.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Detrav.Launcher.Server.Data.Models.ProductVersionFileModel", b =>
-                {
-                    b.HasOne("Detrav.Launcher.Server.Data.Models.FileModel", "File")
-                        .WithMany()
-                        .HasForeignKey("FileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Detrav.Launcher.Server.Data.Models.ProductVersionModel", "Version")
-                        .WithMany("Files")
-                        .HasForeignKey("VersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("File");
-
-                    b.Navigation("Version");
                 });
 
             modelBuilder.Entity("Detrav.Launcher.Server.Data.Models.ProductVersionModel", b =>
@@ -725,17 +708,11 @@ namespace Detrav.Launcher.Server.Data.Migrations
 
             modelBuilder.Entity("Detrav.Launcher.Server.Data.Models.ScreenshotModel", b =>
                 {
-                    b.HasOne("Detrav.Launcher.Server.Data.Models.FileModel", "Data")
-                        .WithMany()
-                        .HasForeignKey("DataId");
-
                     b.HasOne("Detrav.Launcher.Server.Data.Models.ProductModel", "Product")
                         .WithMany("Screenshots")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Data");
 
                     b.Navigation("Product");
                 });
@@ -791,21 +768,6 @@ namespace Detrav.Launcher.Server.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ProductModelProductUserModel", b =>
-                {
-                    b.HasOne("Detrav.Launcher.Server.Data.Models.ProductUserModel", null)
-                        .WithMany()
-                        .HasForeignKey("ProductUsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Detrav.Launcher.Server.Data.Models.ProductModel", null)
-                        .WithMany()
-                        .HasForeignKey("ProductsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("ProductModelTagModel", b =>
                 {
                     b.HasOne("Detrav.Launcher.Server.Data.Models.ProductModel", null)
@@ -837,12 +799,14 @@ namespace Detrav.Launcher.Server.Data.Migrations
 
                     b.Navigation("Screenshots");
 
+                    b.Navigation("Users");
+
                     b.Navigation("Versions");
                 });
 
-            modelBuilder.Entity("Detrav.Launcher.Server.Data.Models.ProductVersionModel", b =>
+            modelBuilder.Entity("Detrav.Launcher.Server.Data.Models.ProductUserModel", b =>
                 {
-                    b.Navigation("Files");
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

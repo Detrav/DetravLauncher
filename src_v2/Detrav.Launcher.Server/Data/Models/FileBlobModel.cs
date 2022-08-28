@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Detrav.Launcher.Server.Data.Models
 {
-    
+    [Index(nameof(Seek), nameof(FileId), IsUnique = true)]
     public class FileBlobModel
     {
         public virtual BlobModel? Blob { get; set; }

@@ -71,7 +71,7 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Screenshots
 
 
 
-            var screenshot = await context.Screenshots.Include(m => m.Data).FirstOrDefaultAsync(m => m.Id == id);
+            var screenshot = await context.Screenshots.FirstOrDefaultAsync(m => m.Id == id);
             if (screenshot == null)
             {
                 return NotFound();
@@ -105,7 +105,7 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Screenshots
                 screenshot.Description = Description;
                 if (aData != null && aData.Length > 0)
                 {
-                    await fileService.RemoveAsync(screenshot.Data);
+                    await fileService.RemoveAsync(AppConstants.COLLECTION_NAME_SCREENSHOTS, screenshot.FilePath);
                     string? fileName = Data?.FileName;
                     if (String.IsNullOrWhiteSpace(fileName))
                     {
@@ -115,7 +115,7 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Screenshots
                     {
                         fileName = Guid.NewGuid() + Path.GetExtension(fileName);
                     }
-                    screenshot.Data = await fileService.StoreAsync("Screenshots", fileName, aData);
+                    screenshot.FilePath = (await fileService.StoreAsync(AppConstants.COLLECTION_NAME_SCREENSHOTS, fileName, aData)).Path;
                 }
 
                 await context.SaveChangesAsync();

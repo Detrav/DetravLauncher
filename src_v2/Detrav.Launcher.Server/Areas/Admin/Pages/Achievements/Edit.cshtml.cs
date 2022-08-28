@@ -74,7 +74,7 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Achievements
 
 
 
-            var achievement = await context.Achievements.Include(m => m.Icon).FirstOrDefaultAsync(m => m.Id == id);
+            var achievement = await context.Achievements.FirstOrDefaultAsync(m => m.Id == id);
             if (achievement == null)
             {
                 return NotFound();
@@ -109,7 +109,7 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Achievements
                 achievement.IsHidden = IsHidden;
                 if (aIcon != null && aIcon.Length > 0)
                 {
-                    await fileService.RemoveAsync(achievement.Icon);
+                    await fileService.RemoveAsync(AppConstants.COLLECTION_NAME_ACHIEVEMENTS, achievement.IconFilePath);
                     string? fileName = Icon?.FileName;
                     if (String.IsNullOrWhiteSpace(fileName))
                     {
@@ -119,7 +119,7 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Achievements
                     {
                         fileName = Guid.NewGuid() + Path.GetExtension(fileName);
                     }
-                    achievement.Icon = await fileService.StoreAsync("Achievements", fileName, aIcon);
+                    achievement.IconFilePath = (await fileService.StoreAsync(AppConstants.COLLECTION_NAME_ACHIEVEMENTS, fileName, aIcon)).Path;
                 }
 
                 await context.SaveChangesAsync();

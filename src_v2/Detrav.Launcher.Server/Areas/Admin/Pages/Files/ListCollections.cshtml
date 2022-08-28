@@ -1,0 +1,47 @@
+﻿@page
+@model Detrav.Launcher.Server.Areas.Admin.Pages.Files.ListCollectionsModel
+@{
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Index">Home</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Index">Admin area</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Files/ListCollections">Files Collections</a></li>
+    </ol>
+</nav>
+
+@if (Model.Items == null || Model.Items.Length == 0)
+{
+    <div class="alert alert-info" role="alert">
+        The administrator did not upload files here, please check back later!
+    </div>
+}
+else
+{
+    @*int index = 0;*@
+    <table class="table">
+        <thead>
+            <tr>
+                @*<th scope="col">#</th>*@
+                <th scope="col">Name</th>
+                <th scope="col">Count</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    @*<th scope="row">@index</th>*@
+                    <td>@item.Collection</td>
+                    <td>@item.Count</td>
+                    <td>
+                        <a type="button" class="btn btn-primary" asp-page="ListFiles" asp-route-collection="@item.Collection">Files</a>
+                        <a type="button" class="btn btn-danger" asp-page="DeleteCollection" asp-route-collection="@item.Collection">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

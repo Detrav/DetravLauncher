@@ -1,0 +1,62 @@
+﻿@page "{id}"
+@using Microsoft.AspNetCore.Http.Extensions
+@model Detrav.Launcher.Server.Areas.Admin.Pages.Versions.EditModel
+@{
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="" asp-page="/Index">Home</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Index">Admin area</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Versions/List">Versions</a></li>
+        <li class="breadcrumb-item active"><a asp-area="Admin" asp-page="/Versions/Edit" asp-route-id="@Model.Version?.Id">Edit - @Model.Version?.Version</a></li>
+    </ol>
+</nav>
+
+@if (!Model.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert" asp-validation-summary="All">
+    </div>
+}
+
+@if (Model.IsSaved)
+{
+    <div class="alert alert-success" role="alert">
+        Saved!!!
+    </div>
+}
+
+
+@if (@Model.Version != null)
+{
+    <h1 class="display-4">
+        @Model.Version.Version
+    </h1>
+
+    <p>
+        <a type="button" class="btn btn-danger" asp-page="Delete" asp-route-id="@Model.Version.Id">Delete</a>
+    </p>
+
+    <form method="post" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-md-12 my-3">
+                <div class="mb-3">
+                    <label asp-for="VersionName" class="form-label">Name</label>
+                    <input class="form-control" asp-for="VersionName" aria-label="readonly input example" readonly>
+                </div>
+                <div class="mb-3">
+                    <input class="form-check-input" type="checkbox" asp-for="IsPublished">
+                    <label class="form-check-label" asp-for="IsPublished">Is version published for user?</label>
+                </div>
+                                <div class="mb-3">
+                    <input class="form-check-input" type="checkbox" asp-for="IsBeta">
+                    <label class="form-check-label" asp-for="IsBeta">Version is beta?</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <button class="btn btn-success w-100" type="submit">Save</button>
+        </div>
+    </form>
+}

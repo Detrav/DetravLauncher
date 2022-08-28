@@ -7,11 +7,9 @@
 <header>
     <h1>@ViewData["Title"]</h1>
     @{
-        if (User.Identity.IsAuthenticated)
+        if ((User.Identity?.IsAuthenticated).GetValueOrDefault())
         {
-            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
-                <button type="submit" class="nav-link btn btn-link text-dark">Click here to Logout</button>
-            </form>
+            <p>There were some problems when logout, try refreshing the page or try again later.</p>
         }
         else
         {

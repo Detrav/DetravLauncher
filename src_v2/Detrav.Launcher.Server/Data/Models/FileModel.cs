@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 namespace Detrav.Launcher.Server.Data.Models
 {
     [Index(nameof(Path), nameof(Collection), IsUnique = true)]
+    [Index(nameof(Path))]
+    [Index(nameof(Collection))]
     public class FileModel : BaseModel
     {
         [Required]

@@ -1,4 +1,5 @@
 using Detrav.Launcher.Server.Data;
+using Detrav.Launcher.Server.Data.Enums;
 using Detrav.Launcher.Server.Data.Models;
 using Detrav.Launcher.Server.Services;
 using Detrav.Launcher.Server.Utils;
@@ -24,9 +25,15 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Products
         [Required]
         [BindProperty]
         public string? Description { get; set; }
+        [Required]
+        [BindProperty]
+        public string? InstallFolder { get; set; }
 
         [BindProperty]
         public bool IsPublished { get; set; }
+
+        [BindProperty]
+        public ProductDistributionType DistributionType { get; set; }
 
         [BindProperty]
         public IFormFile? Poster { get; set; }
@@ -56,6 +63,8 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Products
             ProductName = Product.Name;
             Description = Product.Description;
             IsPublished = Product.IsPublished;
+            InstallFolder = Product.InstallFolder;
+            DistributionType = Product.DistributionType;
 
             return Page();
         }
@@ -82,10 +91,10 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Products
                     aPoster = ms.ToArray();
                     using Image image = Image.Load(aPoster);
                     var size = image.Size();
-                    if (Math.Abs((float)size.Height / (float)size.Width - 1.6) > 0.1)
-                    {
-                        ModelState.AddModelError(nameof(Poster), "Poster must be image with format 10x16! The best size is 500x800!");
-                    }
+                    //if (Math.Abs((float)size.Height / (float)size.Width - 1.6) > 0.1)
+                    //{
+                    //    ModelState.AddModelError(nameof(Poster), "Poster must be image with format 10x16! The best size is 500x800!");
+                    //}
 
                 }
             }
@@ -93,7 +102,7 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Products
             {
                 ModelState.AddModelError(nameof(Poster), ex.Message);
             }
-            var product = await context.Products.Include(m => m.Poster).FirstOrDefaultAsync(m => m.Id == id);
+            var product = await context.Products.FirstOrDefaultAsync(m => m.Id == id);
             if (product == null)
             {
                 return NotFound();
@@ -104,9 +113,11 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Products
                 product.Name = ProductName;
                 product.Description = Description;
                 product.IsPublished = IsPublished;
+                product.InstallFolder = InstallFolder;
+                product.DistributionType = DistributionType;
                 if (aPoster != null && aPoster.Length > 0)
                 {
-                    await fileService.RemoveAsync(product.Poster);
+                    await fileService.RemoveAsync(AppConstants.COLLECTION_NAME_POSTERS, product.PosterFilePath);
                     string? fileName = Poster?.FileName;
                     if (String.IsNullOrWhiteSpace(fileName))
                     {
@@ -116,7 +127,7 @@ namespace Detrav.Launcher.Server.Areas.Admin.Pages.Products
                     {
                         fileName = Guid.NewGuid() + Path.GetExtension(fileName);
                     }
-                    product.Poster = await fileService.StoreAsync("Posters", fileName, aPoster);
+                    product.PosterFilePath = (await fileService.StoreAsync(AppConstants.COLLECTION_NAME_POSTERS, fileName, aPoster)).Path;
                 }
                 await context.SaveChangesAsync();
                 IsSaved = true;

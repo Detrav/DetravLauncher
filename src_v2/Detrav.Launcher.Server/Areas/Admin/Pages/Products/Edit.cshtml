@@ -1,7 +1,16 @@
 ﻿@page "{id}"
+@using Detrav.Launcher.Server.Data.Enums
 @model Detrav.Launcher.Server.Areas.Admin.Pages.Products.EditModel
 @{
 }
+
+<style>
+    .card-body-poster {
+        aspect-ratio: 10 / 16;
+        background-size: cover;
+        background-position: center center;
+    }
+</style>
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -49,7 +58,8 @@
             <div class="col-md-4 my-3">
                 <div class="row">
                     <label asp-for="Poster" class="col-12 col-form-label">
-                        <img src="~/api/Images/GetPosterFromProduct/@Model.Product.Id" class="img-fluid" alt="poster">
+                        <div class="card-body-poster" style="background-image: url(@Url.Content("~/api/Images/GetPosterFromProduct/" + @Model.Product.Id))"></div>
+
                     </label>
                     <div class="col-12">
                         <input class="form-control" asp-for="Poster" />
@@ -68,6 +78,14 @@
                 <div class="mb-3">
                     <label asp-for="Description" class="form-label">Description</label>
                     <textarea class="form-control" asp-for="Description"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="InstallFolder" class="form-label">Install folder</label>
+                    <input class="form-control" asp-for="InstallFolder">
+                </div>
+                <div class="mb-3">
+                    <label asp-for="DistributionType" class="form-label">Distribution type</label>
+                    <select asp-for="DistributionType" class="form-control" asp-items="Html.GetEnumSelectList<ProductDistributionType>()"></select>
                 </div>
 
                 <div class="mb-3">

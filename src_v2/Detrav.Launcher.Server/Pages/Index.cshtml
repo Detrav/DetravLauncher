@@ -11,6 +11,11 @@
         background: rgba(255,255,255,.8);
         width: 100%;
     }
+    .card-body-poster {
+        aspect-ratio: 10 / 16;
+        background-size: cover;
+        background-position: center center;
+    }
 </style>
 
 @if (@Model.Products == null || @Model.Products.Count() == 0)
@@ -25,9 +30,7 @@ else
         @foreach (var product in @Model.Products)
         {
             <div class="col-md-4 col-lg-3 my-3">
-                <a class="card" asp-page="Product" asp-route-id="@product.Id">
-
-                    <img src="~/api/Images/GetPosterFromProduct/@product.Id" class="card-img-top" alt="poster">
+                <a class="card card-body-poster" style="background-image: url(@Url.Content("~/api/Images/GetPosterFromProduct/" + product.Id))"  asp-page="Product" asp-route-id="@product.Id">
                     <div class="card-body card-body-over">
                         <h5 class="card-title text-black">@product.Name</h5>
                     </div>

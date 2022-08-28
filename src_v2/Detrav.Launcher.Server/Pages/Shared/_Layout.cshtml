@@ -23,17 +23,20 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Store</a>
                         </li>
+                        @if ((User.Identity?.IsAuthenticated).GetValueOrDefault())
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Library">Library</a>
+                            </li>
+                        }
                         @if ((await AuthorizationService.AuthorizeAsync(User, Utils.AppConstants.RequireAdministratorRole)).Succeeded)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Admin" asp-page="/Index">Admin area</a>
+                                <a class="nav-link text-dark" asp-area="Admin" asp-page="/Index">Admin`ka</a>
                             </li>
                         }
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

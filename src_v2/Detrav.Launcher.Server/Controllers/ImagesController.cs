@@ -1,6 +1,7 @@
 ﻿using Detrav.Launcher.Server.Data;
 using Detrav.Launcher.Server.Data.Models;
 using Detrav.Launcher.Server.Services;
+using Detrav.Launcher.Server.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -39,14 +40,17 @@ namespace Detrav.Launcher.Server.Controllers
         public async Task<ActionResult> GetPosterFromProduct(int id)
         {
 
-            var product = await context.Products.Include(m => m.Poster).FirstOrDefaultAsync(m => m.Id == id);
+            var product = await context.Products.FirstOrDefaultAsync(m => m.Id == id);
 
-            if (product != null && product.Poster != null && product.Poster.Size > 0)
+            if (product != null && product.PosterFilePath != null)
             {
-
                 if (product.IsPublished || (await authorizationService.AuthorizeAsync(User, Utils.AppConstants.RequireAdministratorRole)).Succeeded)
                 {
-                    return File(await fileService.GetAsync(product.Poster.Id), "image/png");
+                    var file = await fileService.GetOrDefaultAsync(AppConstants.COLLECTION_NAME_POSTERS, product.PosterFilePath);
+                    if (file != null)
+                    {
+                        return File(file, "image/png");
+                    }
                 }
             }
             var path = Path.GetFullPath("wwwroot/imgs/product_placeholder.png");
@@ -61,26 +65,51 @@ namespace Detrav.Launcher.Server.Controllers
             if (String.IsNullOrWhiteSpace(userId))
             {
                 achievement = await context.Achievements
-                    .Include(m => m.Icon)
                     .Include(m => m.Product)
                     .FirstOrDefaultAsync(m => m.Id == id);
             }
             else
             {
                 achievement = await context.Achievements
-                    .Include(m => m.Icon)
                     .Include(m => m.ProductUsers)
                     .Include(m => m.Product)
                     .FirstOrDefaultAsync(m => m.Id == id);
             }
 
-            if (achievement != null && achievement.Icon != null && achievement.Icon.Size > 0)
+            if (achievement != null && achievement.IconFilePath != null)
             {
-                if ((achievement.Product?.IsPublished).GetValueOrDefault() 
+                if ((achievement.Product?.IsPublished).GetValueOrDefault()
                     && (!achievement.IsHidden || achievement.ProductUsers.Any(m => m.UserId == userId))
                     || (await authorizationService.AuthorizeAsync(User, Utils.AppConstants.RequireAdministratorRole)).Succeeded)
                 {
-                    return File(await fileService.GetAsync(achievement.Icon.Id), "image/png");
+                    var file = await fileService.GetOrDefaultAsync(AppConstants.COLLECTION_NAME_ACHIEVEMENTS, achievement.IconFilePath);
+                    if (file != null)
+                        return File(file, "image/png");
+                }
+            }
+
+            var path = Path.GetFullPath("wwwroot/imgs/achievement_placeholder.png");
+            return PhysicalFile(path, "image/png");
+        }
+
+        [HttpGet("GetDataFromScreenshot/{id}")]
+        public async Task<ActionResult> GetDataFromScreenshot(int id)
+        {
+            ScreenshotModel? screenshot;
+            var userId = userManager.GetUserId(User);
+
+            screenshot = await context.Screenshots
+                .Include(m => m.Product)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (screenshot != null && screenshot.FilePath != null)
+            {
+                if ((screenshot.Product?.IsPublished).GetValueOrDefault()
+                    || (await authorizationService.AuthorizeAsync(User, Utils.AppConstants.RequireAdministratorRole)).Succeeded)
+                {
+                    var file = await fileService.GetOrDefaultAsync(AppConstants.COLLECTION_NAME_SCREENSHOTS, screenshot.FilePath);
+                    if (file != null)
+                        return File(file, "image/png");
                 }
             }
 

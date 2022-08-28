@@ -1,6 +1,7 @@
 ﻿using Detrav.Launcher.Server.Data.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Detrav.Launcher.Server.Data
 {
@@ -12,10 +13,10 @@ namespace Detrav.Launcher.Server.Data
         public DbSet<FileModel> Files { get; set; }
         public DbSet<ProductUserModel> ProductUsers { get; set; }
         public DbSet<ProductVersionModel> Versions { get; set; }
-        public DbSet<ProductVersionFileModel> VersionFiles { get; set; }
         public DbSet<ScreenshotModel> Screenshots { get; set; }
         public DbSet<TagModel> Tags { get; set; }
         public DbSet<FileBlobModel> FileBlobs { get; set; }
+        public DbSet<ProductUserLibraryModel> ProductUserLibraries { get; set; }
 
 
 
@@ -34,9 +35,9 @@ namespace Detrav.Launcher.Server.Data
 
             builder.Entity<FileBlobModel>()
                 .HasKey(t => new { t.FileId, t.BlobId });
-
-            builder.Entity<ProductVersionFileModel>()
-               .HasKey(t => new { t.FileId, t.VersionId });
+            builder.Entity<ProductUserLibraryModel>()
+              .HasKey(t => new { t.ProductId, t.UserId });
         }
+
     }
 }

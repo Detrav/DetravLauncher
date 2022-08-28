@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Detrav.Launcher.Uploader": {
+      "commandName": "Project",
+      "commandLineArgs": "\"https://localhost:7265/api/ProductVersion\" \"1.0.0\" \"977ca9f6-113b-4643-b50f-5d4c41ae8631\" \"D:\\EpicGames\\Exports\\TRPG07\""
+    }
+  }
+}

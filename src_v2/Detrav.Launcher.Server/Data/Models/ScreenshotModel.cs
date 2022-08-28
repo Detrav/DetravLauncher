@@ -7,7 +7,7 @@ namespace Detrav.Launcher.Server.Data.Models
         [Required]
         public string? Name { get; set; }
         public string? Description { get; set; }
-        public virtual FileModel? Data { get; set; }
+        public string? FilePath { get; set; }
         [Required]
         public virtual ProductModel? Product { get; set; }
     }

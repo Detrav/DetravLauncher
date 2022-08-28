@@ -19,8 +19,8 @@
 </p>
 
 <pre>
-    DetravLauncher.Uploader.exe "{Url}" "{version}" "{ApiKey}"
-    DetravLauncher.Uploader.exe "@AppUtils.AbsoluteUrlPrefix(Request,"/api/ProductVersion/UploadFile")" "1.0.0" "@Model.ApiKey"
+    Detrav.Launcher.Uploader.exe "{Url}" "{version}" "{ApiKey} {Folder}"
+    Detrav.Launcher.Uploader.exe "@AppUtils.AbsoluteUrlPrefix(Request,"/api/ProductVersion")" "1.0.0" "@Model.ApiKey" "@Model.Folder"
 </pre>
 
 <form method="post">

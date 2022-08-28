@@ -2,34 +2,39 @@
 using Detrav.Launcher.Server.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Text;
 
 namespace Detrav.Launcher.Server.Services
 {
     public interface IFileService
     {
-        Task<FileModel> StoreAsync(string collection, string path, byte[] bytes, bool autoSave = false);
-        Task<byte[]> GetAsync(int fileId);
-        Task<bool> RemoveAsync(FileModel? poster, bool autoSave = false);
-        Task<FileModel> StoreWithAutoSaveAsync(string collection, string filePath, Stream body);
+        Task<FileModel> StoreAsync(string collection, string path, byte[] bytes);
+        Task<byte[]?> GetOrDefaultAsync(int fileId);
+        Task<byte[]?> GetOrDefaultAsync(string collection, string filePath);
+        Task RemoveAsync(FileModel? file);
+        Task<FileModel> StoreAsync(string collection, string filePath, Stream body, long fileSize);
+        Task RemoveAsync(string? collection, string? filePath);
     }
     public class FileService : IFileService
     {
-        private readonly ApplicationDbContext context;
+        private readonly ApplicationDbContext contextCommon;
+        private readonly IServiceScopeFactory serviceScopeFactory;
         private const int BlobSize = 256 * 1024;
 
-        public FileService(ApplicationDbContext context)
+        public FileService(ApplicationDbContext context, IServiceScopeFactory serviceScopeFactory)
         {
-            this.context = context;
+            this.contextCommon = context;
+            this.serviceScopeFactory = serviceScopeFactory;
         }
 
-        public async Task<byte[]> GetAsync(int fileId)
+        public async Task<byte[]?> GetOrDefaultAsync(int fileId)
         {
-            var file = await context.Files.FirstOrDefaultAsync(m => m.Id == fileId);
+            var file = await contextCommon.Files.FirstOrDefaultAsync(m => m.Id == fileId);
             if (file == null)
-                throw new KeyNotFoundException(nameof(fileId));
+                return null;
             var result = new byte[file.Size];
 
-            await foreach (var blob in context.FileBlobs.Include(m => m.Blob).Where(m => m.FileId == fileId).AsAsyncEnumerable())
+            await foreach (var blob in contextCommon.FileBlobs.Include(m => m.Blob).Where(m => m.FileId == fileId).AsAsyncEnumerable())
             {
                 if (blob.Blob?.Data != null && blob.Blob.Size > 0)
                 {
@@ -39,34 +44,37 @@ namespace Detrav.Launcher.Server.Services
             return result;
         }
 
-        public async Task<FileModel> StoreAsync(string collection, string path, byte[] bytes, bool autoSave = false)
+        public async Task<FileModel> StoreAsync(string collection, string path, byte[] bytes)
         {
             if (String.IsNullOrWhiteSpace(path))
                 throw new ArgumentNullException(nameof(path));
             if (bytes == null || bytes.Length == 0)
                 throw new ArgumentNullException(nameof(bytes));
 
+            using var scope = serviceScopeFactory.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
             FileModel model = new FileModel();
 
             model.Path = path;
             model.Size = bytes.LongLength;
             model.Collection = collection;
+            context.Files.Add(model);
+            await context.SaveChangesAsync();
 
             for (long i = 0; i < bytes.LongLength; i += BlobSize)
             {
                 var block = GetBlock(bytes, i);
-                await StoreBlobAsync(block, i, model, autoSave);
+                await StoreBlobAsync(context, block, i, model);
             }
 
-            context.Add(model);
 
-            if (autoSave)
-                await context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             return model;
         }
 
-        private async Task<FileBlobModel> StoreBlobAsync(byte[] block, long seek, FileModel file, bool autoSave)
+        private async Task<FileBlobModel> StoreBlobAsync(ApplicationDbContext context, byte[] block, long seek, FileModel file)
         {
             var md5 = CreateMD5(block);
             var size = block.Length;
@@ -89,11 +97,9 @@ namespace Detrav.Launcher.Server.Services
                         {
                             Blob = blob,
                             Seek = seek,
-                            File = file
+                            FileId = file.Id
                         };
                         context.FileBlobs.Add(result);
-                        if (autoSave)
-                            await context.SaveChangesAsync();
                         return result;
                     }
                 }
@@ -108,14 +114,14 @@ namespace Detrav.Launcher.Server.Services
                 {
                     Blob = blob,
                     Seek = seek,
-                    File = file
+                    FileId = file.Id
                 };
                 context.FileBlobs.Add(result);
-                if (autoSave)
-                    await context.SaveChangesAsync();
                 return result;
             }
         }
+
+
 
         private byte[] GetBlock(byte[] bytes, long seek)
         {
@@ -137,61 +143,108 @@ namespace Detrav.Launcher.Server.Services
             }
         }
 
-        public async Task<bool> RemoveAsync(FileModel? file, bool autoSave = false)
+        public async Task RemoveAsync(FileModel? file)
         {
             if (file != null)
             {
-                context.Files.Remove(file);
-                if (autoSave)
-                    await context.SaveChangesAsync();
-                return true;
+                contextCommon.Files.Remove(file);
+                await contextCommon.SaveChangesAsync();
             }
-            return false;
         }
 
-        public async Task<FileModel> StoreWithAutoSaveAsync(string collection, string filePath, Stream body)
+        public async Task<FileModel> StoreAsync(string collection, string filePath, Stream body, long fileSize)
         {
-
-            var file = new FileModel()
+            IServiceScope? scope = null;
+            try
             {
-                Path = filePath,
-                Collection = collection
-            };
+                scope = serviceScopeFactory.CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-            context.Files.Add(file);
+                int counter = 0;
 
-            await context.SaveChangesAsync();
-
-            byte[] buffer = new byte[BlobSize];
-            int offset = 0;
-            long globalOffset = 0;
-            while (true)
-            {
-                var readBytes = await body.ReadAsync(buffer, offset, BlobSize - offset);
-                offset += readBytes;
-                if (readBytes == 0)
+                var file = new FileModel()
                 {
-                    if (offset > 0)
+                    Path = filePath,
+                    Collection = collection,
+                    Size = fileSize
+                };
+
+                context.Files.Add(file);
+
+                await context.SaveChangesAsync();
+
+                byte[] buffer = new byte[BlobSize];
+                int offset = 0;
+                long globalOffset = 0;
+                while (true)
+                {
+                    var readBytes = await body.ReadAsync(buffer, offset, BlobSize - offset);
+                    offset += readBytes;
+                    if (readBytes == 0)
                     {
-                        await StoreBlobAsync(buffer.Take(offset).ToArray(), globalOffset, file, true);
-                        globalOffset += offset;
+                        if (offset > 0)
+                        {
+                            await StoreBlobAsync(context, buffer.Take(offset).ToArray(), globalOffset, file);
+                            globalOffset += offset;
+                        }
+                        break;
                     }
-                    break;
+                    else if (offset == BlobSize)
+                    {
+                        await StoreBlobAsync(context, buffer, globalOffset, file);
+                        globalOffset += offset;
+                        offset = 0;
+
+                        counter++;
+                        if (counter % 13 == 0)
+                        {
+                            // free mamory on 3.3mb
+                            await context.SaveChangesAsync();
+                            scope.Dispose();
+                            scope = serviceScopeFactory.CreateScope();
+                            context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                        }
+                    }
                 }
-                else if (offset == BlobSize)
-                {
-                    await StoreBlobAsync(buffer, globalOffset, file, true);
-                    globalOffset += offset;
-                    offset = 0;
-                }
+
+                file.Size = globalOffset;
+
+                await context.SaveChangesAsync();
+
+                return file;
+            }
+            finally
+            {
+                if (scope != null)
+                    scope.Dispose();
             }
 
-            file.Size = globalOffset;
+        }
 
-            await context.SaveChangesAsync();
+        public async Task<byte[]?> GetOrDefaultAsync(string collection, string filePath)
+        {
+            var file = await contextCommon.Files.FirstOrDefaultAsync(m => m.Collection == collection && m.Path == filePath);
+            if (file == null)
+                return null;
+            var result = new byte[file.Size];
 
-            return file;
+            await foreach (var blob in contextCommon.FileBlobs.Include(m => m.Blob).Where(m => m.FileId == file.Id).AsAsyncEnumerable())
+            {
+                if (blob.Blob?.Data != null && blob.Blob.Size > 0)
+                {
+                    Array.Copy(blob.Blob.Data, 0, result, blob.Seek, blob.Blob.Size);
+                }
+            }
+            return result;
+        }
 
+        public async Task RemoveAsync(string? collection, string? filePath)
+        {
+            var file = await contextCommon.Files.FirstOrDefaultAsync(m => m.Collection == collection && m.Path == filePath);
+            if (file != null)
+            {
+                contextCommon.Files.Remove(file);
+            }
         }
     }
 }
