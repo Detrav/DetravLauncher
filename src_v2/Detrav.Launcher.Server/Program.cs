@@ -1,4 +1,5 @@
 using Detrav.Launcher.Server.Data;
+using Detrav.Launcher.Server.Middlewares;
 using Detrav.Launcher.Server.Services;
 using Detrav.Launcher.Server.Utils;
 using Microsoft.AspNetCore.Identity;
@@ -32,7 +33,9 @@ namespace Detrav.Launcher.Server
                 }
             }
 
-            app.UsePathBase("/testPath");
+            app.UseMiddleware<StandaloneLauncherMiddleware>();
+
+            //app.UsePathBase("/testPath");
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -110,6 +113,7 @@ namespace Detrav.Launcher.Server
             });
 
             builder.Services.AddScoped<IFileService, FileService>();
+            builder.Services.AddScoped<IStandaloneLauncherService, StandaloneLauncherService>();
         }
     }
 }
