@@ -1,5 +1,7 @@
 ﻿@page "{id}"
 @using Detrav.Launcher.Server.Data.Enums
+@using Detrav.Launcher.Server.Services
+@inject IStandaloneLauncherService StandaloneLauncherService
 @model Detrav.Launcher.Server.Pages.ProductViewModel
 @{
 }
@@ -46,7 +48,14 @@
 
                 @if ((Model.ProductUserLibrary?.IsOwner).GetValueOrDefault())
                 {
-                    <a class="btn btn-warning w-100" href="~/api/InstallerDownload/launcher.zip" >Install</a>
+                    @if (StandaloneLauncherService.IsEnabled)
+                    {
+                        <a class="btn btn-warning w-100" onclick="DetravLauncher.TestMethod(@Model.Product.Id)">Install</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-warning w-100" href="~/api/InstallerDownload/launcher.zip">Install</a>
+                    }
                 }
                 else if (Model.Product.DistributionType == ProductDistributionType.Paid && (Model.ProductUserLibrary?.IsRequest).GetValueOrDefault())
                 {

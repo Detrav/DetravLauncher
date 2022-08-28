@@ -8,11 +8,13 @@ namespace Detrav.Launcher.Client
     {
         private string appUrl;
         private WebView2 webView;
+        private string workingDirectory;
 
         public MainForm()
         {
             InitializeComponent();
 
+            workingDirectory = Environment.GetCommandLineArgs()[1];
             appUrl = Environment.GetCommandLineArgs()[2];
             webView = new WebView2();
             webView.Dock = DockStyle.Fill;
@@ -23,15 +25,22 @@ namespace Detrav.Launcher.Client
             Load += MainForm_LoadAsync;
         }
 
+        private void CoreWebView2_DownloadStarting(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2DownloadStartingEventArgs e)
+        {
+            e.Cancel = true;
+            e.Handled = true;
+        }
+
         private async void MainForm_LoadAsync(object? sender, EventArgs e)
         {
             await webView.EnsureCoreWebView2Async();
             webView.CoreWebView2InitializationCompleted += WebView_CoreWebView2InitializationCompleted;
+            webView.CoreWebView2.AddHostObjectToScript("DetravLauncher", new DetravLauncherModel());
         }
 
         private void WebView_CoreWebView2InitializationCompleted(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2InitializationCompletedEventArgs e)
         {
-            webView.CoreWebView2.OpenDevToolsWindow();
+            webView.CoreWebView2.DownloadStarting += CoreWebView2_DownloadStarting;
         }
 
         private void WebView_NavigationCompleted(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
@@ -57,6 +66,7 @@ namespace Detrav.Launcher.Client
             }
             else
             {
+                e.RequestHeaders.SetHeader("X-DetravLauncherVersion", "12");
                 DialogResult result;
                 try
                 {
