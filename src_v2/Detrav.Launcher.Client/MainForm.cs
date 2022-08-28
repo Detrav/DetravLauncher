@@ -62,11 +62,10 @@ namespace Detrav.Launcher.Client
             }
             else if (e.Uri.StartsWith(appUrl))
             {
-
+                e.RequestHeaders.SetHeader("X-DetravLauncherVersion", "12");
             }
             else
             {
-                e.RequestHeaders.SetHeader("X-DetravLauncherVersion", "12");
                 DialogResult result;
                 try
                 {

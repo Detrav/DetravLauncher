@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Detrav.Launcher.Client", "D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Detrav.Launcher.Client.Launcher", "Detrav.Launcher.Client.Launcher\Detrav.Launcher.Client.Launcher.csproj", "{1DE34673-BD11-4981-91F8-76E2B1217C6A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Detrav.Launcher.ClientAvalonia", "Detrav.Launcher.ClientAvalonia\Detrav.Launcher.ClientAvalonia.csproj", "{EC5B9A70-87C3-4E64-AC24-2B18FBAAF885}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{1DE34673-BD11-4981-91F8-76E2B1217C6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DE34673-BD11-4981-91F8-76E2B1217C6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DE34673-BD11-4981-91F8-76E2B1217C6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC5B9A70-87C3-4E64-AC24-2B18FBAAF885}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC5B9A70-87C3-4E64-AC24-2B18FBAAF885}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC5B9A70-87C3-4E64-AC24-2B18FBAAF885}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC5B9A70-87C3-4E64-AC24-2B18FBAAF885}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
